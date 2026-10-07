@@ -8,19 +8,22 @@ import {Scene5} from './scenes/Scene5';
 import {Scene6} from './scenes/Scene6';
 import {Scene7} from './scenes/Scene7';
 import {C, FPS, INTER} from './theme';
+import voTimings from '../public/audio/vo-timings.json';
 
 export type BrandIntroProps = {hasVo: boolean; hasMusic: boolean; captions: boolean};
 
-/** Voiceover lines: start/end in seconds, as measured in public/audio/vo.mp3. */
-export const VO_LINES: {start: number; end: number; text: string}[] = [
-  {start: 0.4, end: 3.3, text: 'Omar has had the same camera sitting in his cart for eight months.'},
-  {start: 4.8, end: 8.5, text: 'Every payday he opens it. Looks at the price. Closes the tab.'},
-  {start: 9.3, end: 15.65, text: "Meanwhile, life keeps happening. Sunrise at Jebel Jais. His daughter's first run on Kite Beach. All on a phone doing its best."},
-  {start: 15.8, end: 19.85, text: 'Then a friend sends him a link. Same camera. A price that finally makes sense.'},
-  {start: 20.8, end: 26.0, text: 'Brand new, sealed. Free delivery, next day. And he pays when it reaches him.'},
-  {start: 27.3, end: 29.6, text: 'This time, the photo looks the way the moment felt.'},
-  {start: 34.6, end: 37.7, text: 'BuyTech. Great shots, minus the big price tag.'},
+const VO_TEXT = [
+  'Omar has had the same camera sitting in his cart for eight months.',
+  'Every payday he opens it. Looks at the price. Closes the tab.',
+  "Meanwhile, life keeps happening. Sunrise at Jebel Jais. His daughter's first run on Kite Beach. All on a phone doing its best.",
+  'Then a friend sends him a link. Same camera. A price that finally makes sense.',
+  'Brand new, sealed. Free delivery, next day. And he pays when it reaches him.',
+  'This time, the photo looks the way the moment felt.',
+  'BuyTech. Great shots, minus the big price tag.',
 ];
+
+/** Voiceover lines: start/end in seconds, written by scripts/make_vo.py. */
+export const VO_LINES = VO_TEXT.map((text, i) => ({...voTimings[i], text}));
 
 /** Music at 70% in gaps, ducked to 25% under each VO line, clean fade at the end. */
 const musicVolume = (frame: number, hasVo: boolean) => {
