@@ -11,15 +11,15 @@ import {C, FPS, INTER} from './theme';
 
 export type BrandIntroProps = {hasVo: boolean; hasMusic: boolean; captions: boolean};
 
-/** Voiceover lines: start/end in seconds (end is an estimate of where each line finishes). */
+/** Voiceover lines: start/end in seconds, as measured in public/audio/vo.mp3. */
 export const VO_LINES: {start: number; end: number; text: string}[] = [
-  {start: 0.4, end: 4.5, text: 'Omar has had the same camera sitting in his cart for eight months.'},
-  {start: 4.8, end: 9.0, text: 'Every payday he opens it. Looks at the price. Closes the tab.'},
-  {start: 9.3, end: 15.5, text: "Meanwhile, life keeps happening. Sunrise at Jebel Jais. His daughter's first run on Kite Beach. All on a phone doing its best."},
-  {start: 15.8, end: 20.5, text: 'Then a friend sends him a link. Same camera. A price that finally makes sense.'},
-  {start: 20.8, end: 27.0, text: 'Brand new, sealed. Free delivery, next day. And he pays when it reaches him.'},
-  {start: 27.3, end: 31.0, text: 'This time, the photo looks the way the moment felt.'},
-  {start: 34.6, end: 37.6, text: 'BuyTech. Great shots, minus the big price tag.'},
+  {start: 0.4, end: 3.3, text: 'Omar has had the same camera sitting in his cart for eight months.'},
+  {start: 4.8, end: 8.5, text: 'Every payday he opens it. Looks at the price. Closes the tab.'},
+  {start: 9.3, end: 15.65, text: "Meanwhile, life keeps happening. Sunrise at Jebel Jais. His daughter's first run on Kite Beach. All on a phone doing its best."},
+  {start: 15.8, end: 19.85, text: 'Then a friend sends him a link. Same camera. A price that finally makes sense.'},
+  {start: 20.8, end: 26.0, text: 'Brand new, sealed. Free delivery, next day. And he pays when it reaches him.'},
+  {start: 27.3, end: 29.6, text: 'This time, the photo looks the way the moment felt.'},
+  {start: 34.6, end: 37.7, text: 'BuyTech. Great shots, minus the big price tag.'},
 ];
 
 /** Music at 70% in gaps, ducked to 25% under each VO line, clean fade at the end. */
