@@ -11,6 +11,7 @@ Source: "Positive Optimistic Background Music" by LNPlusMusic (Pixabay #286238),
 - The track's own final downbeat (109.195 s) then lands at 34.7 s, on
   "BuyTech" and the logo tile springing up, and its natural ring-out carries
   the tagline to the end.
+- A gentle cut in the speech band (around 1-4 kHz) leaves room for the voice.
 """
 import os, subprocess
 
@@ -32,7 +33,7 @@ graph = (
     f"[0]atrim={start:.3f}:{part1_end:.3f},asetpts=PTS-STARTPTS[a];"
     f"[0]atrim={part2_start:.3f}:{part2_start + part2_len:.3f},asetpts=PTS-STARTPTS[b];"
     f"[a][b]acrossfade=d={XF}:c1=tri:c2=tri,"
-    f"atrim=0:{TOTAL},afade=t=in:d=0.8,afade=t=out:st={TOTAL - 0.6}:d=0.6,"
+    f"atrim=0:{TOTAL},equalizer=f=2500:t=q:w=1.2:g=-4,equalizer=f=1200:t=q:w=1.5:g=-2,afade=t=in:d=0.8,afade=t=out:st={TOTAL - 0.6}:d=0.6,"
     "loudnorm=I=-18:TP=-1.5:LRA=11[out]"
 )
 os.makedirs(os.path.dirname(OUT), exist_ok=True)

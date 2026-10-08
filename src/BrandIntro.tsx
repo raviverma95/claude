@@ -25,17 +25,17 @@ const VO_TEXT = [
 /** Voiceover lines: start/end in seconds, written by scripts/make_vo.py. */
 export const VO_LINES = VO_TEXT.map((text, i) => ({...voTimings[i], text}));
 
-/** Music at 70% in gaps, ducked to 25% under each VO line. */
+/** Music at 40% in gaps, ducked to 12% under each VO line so the voice always sits on top. */
 const musicVolume = (frame: number, hasVo: boolean) => {
   const t = frame / FPS;
-  let v = 0.7;
+  let v = 0.4;
   if (hasVo) {
     for (const l of VO_LINES) {
       const duck = interpolate(t, [l.start - 0.25, l.start, l.end, l.end + 0.3], [0, 1, 1, 0], {
         extrapolateLeft: 'clamp',
         extrapolateRight: 'clamp',
       });
-      v = Math.min(v, 0.7 - 0.45 * duck);
+      v = Math.min(v, 0.4 - 0.28 * duck);
     }
   }
   return v; // the track's own ending and fades are cut into music.mp3 (scripts/make_music.py)
