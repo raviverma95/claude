@@ -3,13 +3,19 @@ import {AbsoluteFill, Easing, interpolate, useCurrentFrame} from 'remotion';
 import {CartPage, cartLayout} from '../components/CartPage';
 import {OmarBust} from '../components/characters';
 import {Cursor} from '../components/ui';
+import {useReel} from '../layout';
 import {C, clamp, ease, enter, POPPINS, springAt} from '../theme';
 
 const START = 0;
-const CARD = {x: 820, y: 250, w: 680};
+// Landscape: Omar left third, laptop right. Reel: both tightened into the centre square.
+const LAYOUTS = {
+  landscape: {card: {x: 820, y: 250, w: 680}, omar: {left: 370, top: 300, w: 480}, base: {extra: 140, left: -56}},
+  reel: {card: {x: 832, y: 268, w: 620}, omar: {left: 405, top: 390, w: 420}, base: {extra: 68, left: -20}},
+};
 
 export const Scene1: React.FC = () => {
   const f = useCurrentFrame() + START;
+  const {card: CARD, omar, base} = LAYOUTS[useReel() ? 'reel' : 'landscape'];
   const fadeIn = interpolate(f, [0, 20], [0, 1], clamp);
   const push = ease(f, [20, 135], [1, 1.06], Easing.inOut(Easing.quad));
   const blink = (f >= 60 && f < 63) || (f >= 118 && f < 121) ? 1 : 0;
@@ -28,10 +34,10 @@ export const Scene1: React.FC = () => {
         />
         {/* Omar */}
         <svg
-          width={480}
-          height={790}
+          width={omar.w}
+          height={(omar.w * 790) / 480}
           viewBox="-170 -120 340 560"
-          style={{position: 'absolute', left: 370, top: 300}}
+          style={{position: 'absolute', left: omar.left, top: omar.top}}
         >
           <OmarBust tee={C.grey} blink={blink} pale={1} chinHand />
         </svg>
@@ -76,8 +82,8 @@ export const Scene1: React.FC = () => {
           <div
             style={{
               margin: '0 auto',
-              width: CARD.w + 140,
-              marginLeft: -56,
+              width: CARD.w + base.extra,
+              marginLeft: base.left,
               height: 26,
               background: '#2A2A2A',
               borderRadius: '0 0 24px 24px',

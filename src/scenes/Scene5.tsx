@@ -3,12 +3,18 @@ import {AbsoluteFill, Easing, interpolate, useCurrentFrame} from 'remotion';
 import {Icon, IconName} from '../components/characters';
 import {BrowserFrame, Shot} from '../components/ui';
 import {ADD_TO_CART, COLLECTION_CARDS} from '../data';
+import {useReel} from '../layout';
 import {C, clamp, ease, INTER, POPPINS, RADIUS, SHADOW, springAt} from '../theme';
 
 const START = 615;
-const FW = 1000;
-const FH = Math.round((FW * 900) / 1440);
-const K = FW / 1440; // display px per screenshot px
+// Scroll distances are in screenshot px, so both layouts scroll the same content.
+const K = 1000 / 1440;
+
+// Landscape: browser left, chips stacked on the right. Reel: browser on top, chips below.
+const LAYOUTS = {
+  landscape: {fw: 1000, frame: {left: 70, top: null as number | null}, circle: {cx: 560, cy: 540, r: 520}, chips: {left: 1100, top: 290, width: 400, step: 172, minHeight: 124}},
+  reel: {fw: 900, frame: {left: 510, top: 30}, circle: {cx: 960, cy: 360, r: 430}, chips: {left: 470, top: 694, width: 980, step: 114, minHeight: 0}},
+};
 
 const CHIPS: {at: number; icon: IconName; title: string; sub?: string}[] = [
   {at: 640, icon: 'boxTick', title: 'Brand new, sealed'},
@@ -42,6 +48,8 @@ const Sweep: React.FC<{x: number; y: number; p: number}> = ({x, y, p}) => {
 
 export const Scene5: React.FC = () => {
   const f = useCurrentFrame() + START;
+  const {fw: FW, frame, circle, chips} = LAYOUTS[useReel() ? 'reel' : 'landscape'];
+  const FH = Math.round((FW * 900) / 1440);
 
   const homeScroll = ease(f, [618, 675], [0, 900 / K]);
   const toCollection = ease(f, [675, 689], [0, 1], Easing.inOut(Easing.cubic));
@@ -66,23 +74,22 @@ export const Scene5: React.FC = () => {
 
   // Chip stack: each lands, earlier ones nudge up 12 px
   const landed = CHIPS.map((c) => springAt(f, c.at));
-  const chipTop = 290;
 
   return (
     <AbsoluteFill style={{background: C.white}}>
       <div
         style={{
           position: 'absolute',
-          left: 560 - 520,
-          top: 540 - 520,
-          width: 1040,
-          height: 1040,
-          borderRadius: 520,
+          left: circle.cx - circle.r,
+          top: circle.cy - circle.r,
+          width: circle.r * 2,
+          height: circle.r * 2,
+          borderRadius: circle.r,
           background: C.greenTint,
           transform: `scale(${0.85 + 0.15 * frameIn})`,
         }}
       />
-      <div style={{position: 'absolute', left: 70, top: 540 - (FH + 56) / 2, perspective: 1800}}>
+      <div style={{position: 'absolute', left: frame.left, top: frame.top ?? 540 - (FH + 56) / 2, perspective: 1800}}>
         <div style={{transform: `rotateY(-6deg) rotateZ(-1deg)`, transformOrigin: '0% 50%'}}>
           <BrowserFrame width={FW} height={FH}>
             {/* home */}
@@ -143,16 +150,16 @@ export const Scene5: React.FC = () => {
         if (f < c.at) return null;
         const s = landed[i];
         const nudge = landed.slice(i + 1).reduce((a, b) => a + b, 0) * 12;
-        const top = chipTop + i * 172 - nudge;
+        const top = chips.top + i * chips.step - nudge;
         return (
           <div
             key={c.title}
             style={{
               position: 'absolute',
-              left: 1100,
+              left: chips.left,
               top,
-              width: 400,
-              minHeight: 124,
+              width: chips.width,
+              minHeight: chips.minHeight,
               boxSizing: 'border-box',
               background: C.white,
               borderRadius: RADIUS,

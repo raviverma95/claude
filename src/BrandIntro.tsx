@@ -76,20 +76,34 @@ const Captions: React.FC<{frame: number}> = ({frame}) => {
   );
 };
 
-export const BrandIntro: React.FC<BrandIntroProps> = ({hasVo, hasMusic, captions}) => (
-  <AbsoluteFill style={{background: C.white}}>
+/** All seven scenes on the 1920 x 1080 canvas. */
+export const Scenes: React.FC = () => (
+  <>
     {SCENES.map(([from, to, Scene]) => (
       <Sequence key={from} from={from} durationInFrames={to - from}>
         <Scene />
       </Sequence>
     ))}
+  </>
+);
+
+/** Voiceover and music, with the music ducked under each line. */
+export const Soundtrack: React.FC<{hasVo: boolean; hasMusic: boolean}> = ({hasVo, hasMusic}) => (
+  <>
+    {hasVo && <Audio src={staticFile('audio/vo.mp3')} />}
+    {hasMusic && <Audio src={staticFile('audio/music.mp3')} volume={(f) => musicVolume(f, hasVo)} />}
+  </>
+);
+
+export const BrandIntro: React.FC<BrandIntroProps> = ({hasVo, hasMusic, captions}) => (
+  <AbsoluteFill style={{background: C.white}}>
+    <Scenes />
     {captions && (
       <Sequence>
         <CaptionLayer />
       </Sequence>
     )}
-    {hasVo && <Audio src={staticFile('audio/vo.mp3')} />}
-    {hasMusic && <Audio src={staticFile('audio/music.mp3')} volume={(f) => musicVolume(f, hasVo)} />}
+    <Soundtrack hasVo={hasVo} hasMusic={hasMusic} />
   </AbsoluteFill>
 );
 

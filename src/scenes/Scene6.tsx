@@ -1,7 +1,8 @@
 import React from 'react';
 import {AbsoluteFill, Easing, interpolate, useCurrentFrame} from 'remotion';
 import {KraftBox, Layla, OmarProfileCamera, OmarStanding} from '../components/characters';
-import {FinalPhoto, PHOTO} from '../components/FinalPhoto';
+import {FinalPhoto, usePhoto} from '../components/FinalPhoto';
+import {useReel} from '../layout';
 import {BeachView} from '../components/views';
 import {C, bounce, clamp, ease, POPPINS, springAt} from '../theme';
 
@@ -112,6 +113,7 @@ const TheDoor: React.FC<{f: number}> = ({f}) => {
 };
 
 const TheShot: React.FC<{f: number}> = ({f}) => {
+  const reel = useReel();
   const focus = ease(f, [870, 880], [0, 40], Easing.out(Easing.cubic));
   const snap = springAt(f, 872, {damping: 12, stiffness: 260, mass: 0.5});
   const laylaX = 1330;
@@ -144,7 +146,7 @@ const TheShot: React.FC<{f: number}> = ({f}) => {
             ))}
           </g>
         )}
-        <g transform="translate(540 430) scale(1.6)">
+        <g transform={`translate(${reel ? 610 : 540} 430) scale(1.6)`}>
           <OmarProfileCamera tee={C.green} focus={focus} />
         </g>
       </svg>
@@ -154,6 +156,7 @@ const TheShot: React.FC<{f: number}> = ({f}) => {
 
 export const Scene6: React.FC = () => {
   const f = useCurrentFrame() + START;
+  const PHOTO = usePhoto();
   if (f < 858) return <TheDoor f={f} />;
   if (f < 887) {
     return (

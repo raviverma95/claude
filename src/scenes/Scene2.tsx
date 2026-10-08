@@ -2,11 +2,11 @@ import React from 'react';
 import {AbsoluteFill, Easing, interpolate, useCurrentFrame} from 'remotion';
 import {CartPage, cartLayout, CART_H} from '../components/CartPage';
 import {Cursor} from '../components/ui';
+import {useReel} from '../layout';
 import {C, clamp, ease, POPPINS, RADIUS, SHADOW} from '../theme';
 
 const START = 135;
 const REPEATS = [140, 182, 224];
-const CARD = {x: 420, y: 320, w: 1080};
 const STRIP = 60;
 const TAB = {x: 18, w: 280};
 
@@ -14,6 +14,8 @@ const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
 
 export const Scene2: React.FC = () => {
   const f = useCurrentFrame() + START;
+  // Reel: leave a 36 px margin inside the centre square
+  const CARD = useReel() ? {x: 456, y: 320, w: 1008} : {x: 420, y: 320, w: 1080};
   const L = cartLayout(CARD.w);
   const pillC = {x: CARD.x + L.pill.x + L.pill.w / 2, y: CARD.y + STRIP + L.pill.y + L.pill.h / 2};
   const closeX = {x: CARD.x + TAB.x + TAB.w - 30, y: CARD.y + STRIP / 2 + 4};

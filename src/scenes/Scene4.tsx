@@ -3,17 +3,26 @@ import {AbsoluteFill, Easing, Img, interpolate, staticFile, useCurrentFrame} fro
 import {OmarBust} from '../components/characters';
 import {BrowserFrame, Cursor, Shot, Words} from '../components/ui';
 import {PRICE_BOX, PRODUCT_NAME, PRODUCT_PHOTO, PRODUCT_PRICE, PRODUCT_SHOT_H} from '../data';
+import {useReel} from '../layout';
 import {C, clamp, ease, enter, exitAt, INTER, POPPINS, RADIUS, SHADOW, springAt} from '../theme';
 
 const START = 465;
 const BUBBLE = {x: 650, y: 250, w: 620};
-const FRAME_W = 860;
-const FRAME_H = Math.round((FRAME_W * PRODUCT_SHOT_H) / 1440);
-const FRAME = {x: 150, y: 540 - (FRAME_H + 56) / 2, w: FRAME_W, h: FRAME_H + 56};
+const frameRect = (x: number, w: number, top?: number) => {
+  const h = Math.round((w * PRODUCT_SHOT_H) / 1440) + 56;
+  return {x, y: top ?? 540 - h / 2, w, h};
+};
+// Landscape: browser frame left, price column right. Reel: frame on top, price below.
+const LAYOUTS = {
+  landscape: {frame: frameRect(150, 860), price: {left: 1060, top: 300, width: 440}, pip: {left: 440, top: 690}},
+  reel: {frame: frameRect(470, 980, 40), price: {left: 470, top: 736, width: 980}, pip: {left: 1172, top: 372}},
+};
 const MESSAGE = 'Bro. Check this one.';
 
 export const Scene4: React.FC = () => {
   const f = useCurrentFrame() + START;
+  const reel = useReel();
+  const {frame: FRAME, price, pip: pipPos} = LAYOUTS[reel ? 'reel' : 'landscape'];
 
   // Bubble pops with overshoot 0 -> 1.08 -> 1
   const pop = interpolate(f, [465, 474, 480], [0, 1.08, 1], {...clamp, easing: Easing.out(Easing.quad)});
@@ -206,17 +215,23 @@ export const Scene4: React.FC = () => {
 
       {/* Price column */}
       {f >= 534 && (
-        <div style={{position: 'absolute', left: 1060, top: 300, width: 440}}>
+        <div style={{position: 'absolute', ...price}}>
           <div style={{fontFamily: POPPINS, fontWeight: 700, fontSize: 40, color: C.ink, ...enter(f, 536)}}>Same camera.</div>
-          <div style={{fontFamily: POPPINS, fontWeight: 800, color: C.ink, lineHeight: 1, marginTop: 18, ...enter(f, 541)}}>
-            <div style={{fontSize: 52}}>{currency}</div>
-            <div style={{fontSize: 88, letterSpacing: -2}}>{amount}</div>
+          <div style={{fontFamily: POPPINS, fontWeight: 800, color: C.ink, lineHeight: 1, marginTop: reel ? 10 : 18, ...enter(f, 541)}}>
+            {reel ? (
+              <div style={{fontSize: 88, letterSpacing: -2}}>{PRODUCT_PRICE}</div>
+            ) : (
+              <>
+                <div style={{fontSize: 52}}>{currency}</div>
+                <div style={{fontSize: 88, letterSpacing: -2}}>{amount}</div>
+              </>
+            )}
           </div>
           <Words
             text="A price that finally makes sense."
             frame={f}
             start={556}
-            style={{fontFamily: POPPINS, fontWeight: 700, fontSize: 40, lineHeight: 1.2, color: C.green, marginTop: 30}}
+            style={{fontFamily: POPPINS, fontWeight: 700, fontSize: 40, lineHeight: 1.2, color: C.green, marginTop: reel ? 18 : 30}}
           />
         </div>
       )}
@@ -226,8 +241,7 @@ export const Scene4: React.FC = () => {
         <div
           style={{
             position: 'absolute',
-            left: 440,
-            top: 690,
+            ...pipPos,
             width: 300,
             height: 320,
             borderRadius: RADIUS,

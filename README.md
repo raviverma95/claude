@@ -3,6 +3,7 @@
 38 s, 1140 frames at 30 fps, 1920 x 1080. Built in Remotion from the script and motion brief.
 
 - `renders/buytech-intro.mp4`: master render (H.264, CRF 16) with the ElevenLabs voiceover (Charlie)
+- `renders/buytech-reel.mp4`: 1080 x 1920 reel for Instagram, TikTok and YouTube Shorts
 - `renders/voice-samples/`: the same script line in each ElevenLabs voice available on the current plan
 - `renders/stills/`: one still from the midpoint of each scene
 
@@ -11,6 +12,7 @@
 ```bash
 npm install
 npx remotion render BrandIntro out/buytech-intro.mp4 --codec h264 --crf 16
+npx remotion render Reel out/buytech-reel.mp4 --codec h264 --crf 16
 npx remotion studio            # live preview
 ```
 
@@ -32,6 +34,10 @@ ffmpeg -i out/buytech-intro.mp4 -c:v copy -af "loudnorm=I=-14:TP=-1.0:LRA=11" -a
 ```
 
 Render with `--props='{"captions":true}'` to burn the script in as subtitles.
+
+## Reel (9:16)
+
+`src/Reel.tsx` puts the logo in a header, the story in a 1080 x 1080 stage (the centre square of the landscape canvas), and burned-in captions on a footer band. The header logo is greyscale and the footer ink until the turn at 15.5 s, when both turn green. Scenes that would not fit the square switch layout through `useReel()` (`src/layout.ts`): in scenes 4 and 5 the browser goes on top with the price or USP chips below, and in scene 7 the cards stack in one column. The footer's lower part is left free for the Instagram/TikTok caption overlay.
 
 ## Where things live
 

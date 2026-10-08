@@ -1,7 +1,8 @@
 import React from 'react';
 import {AbsoluteFill, Easing, Img, interpolate, interpolateColors, staticFile, useCurrentFrame} from 'remotion';
 import {Icon, IconName} from '../components/characters';
-import {FinalPhoto, PHOTO} from '../components/FinalPhoto';
+import {FinalPhoto, usePhoto} from '../components/FinalPhoto';
+import {useReel} from '../layout';
 import {Words} from '../components/ui';
 import {C, clamp, ease, enter, INTER, POPPINS, RADIUS, SHADOW, springAt} from '../theme';
 
@@ -13,9 +14,11 @@ const CARDS: {icon: IconName; title: string; sub: string}[] = [
   {icon: 'chatSmile', title: 'Human Support', sub: 'WhatsApp a real person, not a bot'},
   {icon: 'returnBox', title: '15-Day Returns', sub: 'Full refund, no questions'},
 ];
-const CARD_W = 520;
-const CARD_H = 220;
-const GRID = {x: 420, y: 300, gap: 40};
+// Landscape: 2 x 2 grid. Reel: one column, so each card has room to breathe.
+const GRIDS = {
+  landscape: {cols: 2, w: 520, h: 220, x: 420, y: 300, gap: 40},
+  reel: {cols: 1, w: 900, h: 196, x: 510, y: 110, gap: 24},
+};
 
 // Logo geometry in the 1920 x 819 source PNG
 const SRC_W = 1920;
@@ -41,6 +44,9 @@ const LogoCrop: React.FC<{x: number; y: number; w: number; h: number; style?: Re
 
 export const Scene7: React.FC = () => {
   const f = useCurrentFrame() + START;
+  const PHOTO = usePhoto();
+  const GRID = GRIDS[useReel() ? 'reel' : 'landscape'];
+  const {w: CARD_W, h: CARD_H} = GRID;
 
   /* ---------------- Part A ---------------- */
   const photoP = ease(f, [930, 952], [0, 1], Easing.inOut(Easing.cubic));
@@ -86,8 +92,8 @@ export const Scene7: React.FC = () => {
         CARDS.map((c, i) => {
           const start = 945 + i * 6;
           if (f < start) return null;
-          const col = i % 2;
-          const row = Math.floor(i / 2);
+          const col = i % GRID.cols;
+          const row = Math.floor(i / GRID.cols);
           const x0 = GRID.x + col * (CARD_W + GRID.gap);
           const y0 = GRID.y + row * (CARD_H + GRID.gap);
           const size = MERGE_SIZE;

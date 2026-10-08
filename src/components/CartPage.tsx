@@ -57,7 +57,7 @@ export const CartPage: React.FC<{
           <GenericCamera />
         </svg>
       </div>
-      <div style={{...abs(228, 254, W * 0.22, 22), background: '#D5D8D6', borderRadius: 11}} />
+      <div style={{...abs(228, 254, Math.min(W * 0.22, W - 546), 22), background: '#D5D8D6', borderRadius: 11}} />
       <div style={{...abs(228, 292, W * 0.14, 18), background: '#E4E6E4', borderRadius: 9}} />
       <div
         style={{
