@@ -23,7 +23,15 @@ python3 scripts/make_vo.py                            # Charlie (default), 3 tak
 python3 scripts/make_vo.py TX3LPaxmHKxFdv7VOQHJ 4     # another voice id, 4 takes
 ```
 
-Music: add `public/audio/music.mp3` and re-render. It plays at 70%, ducks to 25% under each voiceover line, and fades out from 36.7 s. Both audio files are picked up automatically. Render with `--props='{"captions":true}'` to burn the script in as subtitles.
+Music: "Positive Optimistic Background Music" by LNPlusMusic (Pixabay #286238). `scripts/make_music.py` cuts it to the video on its 150 BPM bar grid. The full band comes in on the green chat bubble at 15.5 s. One 4-bar phrase is removed at 26.7 s, on a scene cut. The track's final downbeat lands on "BuyTech" and the logo at 34.7 s, and its natural ring-out carries the tagline. In the video it plays at 70% and ducks to 25% under each voiceover line. The Pixabay licence allows it in the video but not as a standalone file, so the track is kept out of git: put the original MP3 at `assets/music/lnplusmusic-positive-optimistic-286238.mp3` and run `python3 scripts/make_music.py` before rendering.
+
+The delivered `renders/buytech-intro.mp4` has its audio normalised to -14 LUFS (YouTube's loudness target):
+
+```bash
+ffmpeg -i out/buytech-intro.mp4 -c:v copy -af "loudnorm=I=-14:TP=-1.0:LRA=11" -ar 48000 -c:a aac -b:a 192k renders/buytech-intro.mp4
+```
+
+Render with `--props='{"captions":true}'` to burn the script in as subtitles.
 
 ## Where things live
 

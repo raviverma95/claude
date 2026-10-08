@@ -25,7 +25,7 @@ const VO_TEXT = [
 /** Voiceover lines: start/end in seconds, written by scripts/make_vo.py. */
 export const VO_LINES = VO_TEXT.map((text, i) => ({...voTimings[i], text}));
 
-/** Music at 70% in gaps, ducked to 25% under each VO line, clean fade at the end. */
+/** Music at 70% in gaps, ducked to 25% under each VO line. */
 const musicVolume = (frame: number, hasVo: boolean) => {
   const t = frame / FPS;
   let v = 0.7;
@@ -38,7 +38,7 @@ const musicVolume = (frame: number, hasVo: boolean) => {
       v = Math.min(v, 0.7 - 0.45 * duck);
     }
   }
-  return v * interpolate(t, [36.7, 38], [1, 0], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'});
+  return v; // the track's own ending and fades are cut into music.mp3 (scripts/make_music.py)
 };
 
 const SCENES: [number, number, React.FC][] = [
