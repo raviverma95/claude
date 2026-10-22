@@ -1,0 +1,22 @@
+client_name: "Example Co"
+brand_names: ["Example Co", "ExampleCo", "Example"]   # all variants to match
+domain: "example.com"
+competitors:
+  - name: "Competitor A"
+    aliases: ["Comp A"]
+    domain: "competitora.com"
+  - name: "Competitor B"
+    aliases: []
+    domain: "competitorb.com"
+country: "AU"          # for AI Overviews location
+runs_per_prompt: 1     # can raise to 3 later to smooth out variance
+engines:
+  chatgpt: true
+  perplexity: true
+  gemini: true
+  ai_overviews: true
+models:
+  openai: ""           # fill after checking docs
+  perplexity: ""
+  gemini: ""
+max_calls_per_run: 300 # safety cap on spend
