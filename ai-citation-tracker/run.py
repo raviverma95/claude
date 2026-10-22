@@ -1,16 +1,57 @@
 """Main entry point: python run.py"""
 
+import csv
 import importlib
 import sys
 import time
+from datetime import date
 
+from detect import analyse
 from engines.base import EngineError
-from settings import ENGINES, ConfigError, load_api_keys, load_client, load_prompts
+from settings import ENGINES, OUTPUT_DIR, ConfigError, load_api_keys, load_client, load_prompts
 
 DELAY_BETWEEN_CALLS = 1.0  # seconds, to stay under rate limits
 
 # engines that have a module in engines/ so far
 BUILT_ENGINES = {"perplexity"}
+
+COLUMNS = [
+    "run_date", "client", "prompt_id", "prompt", "category", "engine", "run_number",
+    "brand_mentioned", "brand_position", "domain_cited", "cited_urls",
+    "competitors_mentioned", "answer_text", "error",
+]
+
+
+def output_path(run_date: str):
+    """output/results_YYYY-MM-DD.csv, or _2, _3... if that day already has a file."""
+    OUTPUT_DIR.mkdir(exist_ok=True)
+    path = OUTPUT_DIR / f"results_{run_date}.csv"
+    n = 2
+    while path.exists():
+        path = OUTPUT_DIR / f"results_{run_date}_{n}.csv"
+        n += 1
+    return path
+
+
+def make_row(cfg, run_date, prompt, engine, run_number, result, error) -> dict:
+    row = {
+        "run_date": run_date, "client": cfg.client_name, "prompt_id": prompt.prompt_id,
+        "prompt": prompt.prompt, "category": prompt.category, "engine": engine,
+        "run_number": run_number, "brand_mentioned": "", "brand_position": "",
+        "domain_cited": "", "cited_urls": "", "competitors_mentioned": "",
+        "answer_text": "", "error": error,
+    }
+    if result is not None:  # failed calls keep the detection columns blank
+        found = analyse(result.answer_text, result.cited_urls, cfg)
+        row.update(
+            brand_mentioned="TRUE" if found["brand_mentioned"] else "FALSE",
+            brand_position=found["brand_position"] or "",
+            domain_cited="TRUE" if found["domain_cited"] else "FALSE",
+            cited_urls=" | ".join(result.cited_urls),
+            competitors_mentioned=" | ".join(found["competitors_mentioned"]),
+            answer_text=result.answer_text,
+        )
+    return row
 
 
 def plan_engines(cfg, keys) -> list[str]:
@@ -58,7 +99,18 @@ def main() -> int:
     print()
 
     modules = {name: importlib.import_module(f"engines.{name}") for name in engines}
-    results = []
+    run_date = date.today().isoformat()
+    path = output_path(run_date)
+    # utf-8-sig so Excel shows accents and symbols correctly
+    with path.open("w", newline="", encoding="utf-8-sig") as f:
+        writer = csv.DictWriter(f, fieldnames=COLUMNS)
+        writer.writeheader()
+        run_jobs(cfg, keys, jobs, modules, run_date, writer, f)
+    print(f"\nSaved {len(jobs)} rows to {path.relative_to(path.parent.parent)}")
+    return 0
+
+
+def run_jobs(cfg, keys, jobs, modules, run_date, writer, f) -> None:
     for i, (prompt, engine, run_number) in enumerate(jobs, start=1):
         if i > 1:
             time.sleep(DELAY_BETWEEN_CALLS)
@@ -79,19 +131,8 @@ def main() -> int:
         if error:
             status = f"FAILED: {error[:120]}"
         print(f"[{i}/{len(jobs)}] {engine} | prompt {prompt.prompt_id} | {status}")
-        results.append((prompt, engine, run_number, result, error))
-
-    # Step 2 preview; detection and CSV output come in step 3.
-    print()
-    for prompt, engine, run_number, result, error in results:
-        print(f"--- {engine} | prompt {prompt.prompt_id}: {prompt.prompt}")
-        if error:
-            print(f"    error: {error}")
-            continue
-        print(f"    answer: {result.answer_text[:200].replace(chr(10), ' ')}...")
-        for url in result.cited_urls:
-            print(f"    source: {url}")
-    return 0
+        writer.writerow(make_row(cfg, run_date, prompt, engine, run_number, result, error))
+        f.flush()  # keep finished rows on disk even if the run is stopped
 
 
 if __name__ == "__main__":

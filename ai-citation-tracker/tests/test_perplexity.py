@@ -3,10 +3,13 @@
 Run with: python -m unittest discover tests
 """
 
+import csv
 import io
 import json
+import tempfile
 import unittest
 from contextlib import redirect_stdout
+from pathlib import Path
 from unittest import mock
 
 import requests
@@ -110,7 +113,9 @@ class RunTests(unittest.TestCase):
             return fake_response(200, agent_response(prompt))
 
         out = io.StringIO()
-        with mock.patch.object(run, "load_api_keys", return_value={"perplexity": "k"}), \
+        tmp = Path(tempfile.mkdtemp())
+        with mock.patch.object(run, "OUTPUT_DIR", tmp), \
+                mock.patch.object(run, "load_api_keys", return_value={"perplexity": "k"}), \
                 mock.patch.object(run.time, "sleep"), \
                 mock.patch.object(base.requests, "request", side_effect=fake_request), \
                 redirect_stdout(out):
@@ -121,6 +126,23 @@ class RunTests(unittest.TestCase):
         self.assertIn("[1/3] perplexity | prompt 1 | ok, 3 sources", text)
         self.assertIn("[2/3] perplexity | prompt 2 | FAILED: HTTP 401", text)
         self.assertIn("[3/3] perplexity | prompt 3 | ok, 3 sources", text)
+
+        files = list(tmp.glob("results_*.csv"))
+        self.assertEqual(len(files), 1)
+        with files[0].open(newline="", encoding="utf-8-sig") as f:
+            rows = list(csv.DictReader(f))
+        self.assertEqual(list(rows[0]), run.COLUMNS)
+        self.assertEqual(len(rows), 3)
+        ok, failed = rows[0], rows[1]
+        self.assertEqual(ok["engine"], "perplexity")
+        self.assertEqual(ok["brand_mentioned"], "TRUE")
+        self.assertEqual(ok["brand_position"], "2")  # "Competitor A and Example Co"
+        self.assertEqual(ok["domain_cited"], "TRUE")
+        self.assertEqual(ok["competitors_mentioned"], "Competitor A")
+        self.assertEqual(ok["cited_urls"].split(" | ")[1], "https://example.com/about")
+        self.assertEqual(ok["error"], "")
+        self.assertIn("HTTP 401", failed["error"])
+        self.assertEqual(failed["brand_mentioned"], "")
 
 
 if __name__ == "__main__":
