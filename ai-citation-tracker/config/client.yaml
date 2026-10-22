@@ -17,6 +17,6 @@ engines:
   ai_overviews: true
 models:
   openai: ""           # fill after checking docs
-  perplexity: ""
+  perplexity: "perplexity/sonar"   # Perplexity's own low-cost web search model (Agent API id)
   gemini: ""
 max_calls_per_run: 300 # safety cap on spend
