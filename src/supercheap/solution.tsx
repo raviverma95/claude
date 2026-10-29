@@ -5,6 +5,10 @@ import {clamp, ease, pop, POPPINS, S, SAFE, SAFE_CX, SAFE_W, sec, textIn} from '
 import {Chip, Headline, LogoSting, PhoneFrame, Photo, Underlined} from './components';
 import {PHONE, PRICE, PRICE_PLACEHOLDER, ROUTE, URL} from './data';
 import {AusMap, Box, BoxBody, BoxStyle, Cab, Car, City, House, Wheel} from './drawings';
+import {useWide, WIDE} from './format';
+
+/** Text column used by the wide (1920 x 1080) layouts. */
+const COL = {left: WIDE.left, width: WIDE.colW};
 
 const white: React.CSSProperties = {background: S.white};
 
@@ -31,16 +35,19 @@ export const LogoReveal: React.FC<{f: number}> = ({f}) => {
   const wipe = ease(f, [start, start + 8], [0, 1], Easing.out(Easing.cubic));
   const breathe = interpolate(f, [start + 20, start + 120], [1, 1.03], clamp);
   const simple = sec(phraseAt(4, 'simple'));
+  const wide = useWide();
+  const logoW = wide ? 900 : 820;
   return (
     <AbsoluteFill style={{background: S.navy900}}>
       <div style={{position: 'absolute', left: 0, right: 0, bottom: 0, height: `${wipe * 100}%`, background: S.white}} />
-      <div style={{position: 'absolute', left: SAFE_CX - 410, top: 520, transform: `scale(${breathe})`, transformOrigin: '410px 110px'}}>
-        <LogoSting frame={f} at={SNAPS.logo} width={820} />
+      <div style={{position: 'absolute', left: (wide ? 960 : SAFE_CX) - logoW / 2, top: wide ? 200 : 520, transform: `scale(${breathe})`, transformOrigin: `${logoW / 2}px 110px`}}>
+        <LogoSting frame={f} at={SNAPS.logo} width={logoW} />
       </div>
       <Headline
         frame={f}
-        top={860}
+        top={wide ? 520 : 860}
         align="center"
+        {...(wide ? {left: 0, width: WIDE.w} : {})}
         lines={[
           {text: 'Keeps it', at: simple - 6, size: 110},
           {text: 'simple.', at: simple + 2, red: true, underline: true, size: 110},
@@ -78,17 +85,20 @@ export const Calculator: React.FC<{f: number}> = ({f}) => {
   const slideTo3 = ease(f, [priceAt - 4, priceAt + 4], [0, 1]);
   const priceIn = pop(f, priceAt, {damping: 11, stiffness: 240, mass: 0.6});
   const loading = f >= sizeTap + 4 && f < priceAt - 4;
+  const wide = useWide();
+  const size = wide ? 96 : 84;
   return (
     <AbsoluteFill style={white}>
       <Headline
         frame={f}
-        top={250}
+        top={wide ? 340 : 250}
+        {...(wide ? COL : {})}
         lines={[
-          {text: 'Instant price.', at: start + 6, size: 84},
-          {text: 'No callbacks.', at: noCallbacks, red: true, underline: true, size: 84},
+          {text: 'Instant price.', at: start + 6, size},
+          {text: 'No callbacks.', at: noCallbacks, red: true, underline: true, size},
         ]}
       />
-      <PhoneFrame x={SAFE_CX - 230} y={500} w={460} h={860}>
+      <PhoneFrame x={wide ? 1180 : SAFE_CX - 230} y={wide ? 60 : 500} w={460} h={860}>
         <div style={{position: 'absolute', left: 0, right: 0, top: 0, height: 120, borderBottom: `2px solid ${S.navy100}`, display: 'flex', alignItems: 'flex-end', padding: '0 24px 14px'}}>
           <Img src={staticFile('supercheap/logo.png')} style={{width: 210}} />
         </div>
@@ -169,10 +179,15 @@ export const Calculator: React.FC<{f: number}> = ({f}) => {
 /* Scene 7 (25.0-30.0 s): packed by trained, insured removalists. */
 export const Insured: React.FC<{f: number}> = ({f}) => {
   const start = sec(25.0);
+  const wide = useWide();
   return (
     <AbsoluteFill style={white}>
-      <Photo src="supercheap/photos/boxes-crew.jpg" frame={f} from={start} to={start + 150} pan={[72, 84]} zoom={[1.02, 1.08]} />
-      <div style={{position: 'absolute', left: SAFE.left, top: 1060, display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 22}}>
+      {wide ? (
+        <Photo src="supercheap/photos/boxes-crew.jpg" frame={f} from={start} to={start + 150} posY={22} zoom={[1.0, 1.06]} />
+      ) : (
+        <Photo src="supercheap/photos/boxes-crew.jpg" frame={f} from={start} to={start + 150} pan={[72, 84]} zoom={[1.02, 1.08]} />
+      )}
+      <div style={{position: 'absolute', left: wide ? WIDE.left : SAFE.left, top: wide ? 560 : 1060, display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 22}}>
         <Chip text="Fully insured" frame={f} at={sec(phraseAt(6, 'insured')) + 10} />
         <Chip text="Trained team" frame={f} at={sec(phraseAt(6, 'trained')) + 12} />
       </div>
@@ -189,10 +204,15 @@ export const Routes: React.FC<{f: number}> = ({f}) => {
   const land = STAT_LAND;
   const n = Math.round(interpolate(f, [countFrom, land], [0, 60], {...clamp, easing: Easing.out(Easing.cubic)}));
   const statIn = textIn(f, countFrom - 2);
+  const wide = useWide();
   if (f < mapAt) {
     return (
       <AbsoluteFill style={white}>
-        <Photo src="supercheap/photos/truck-highway.jpg" frame={f} from={start} to={mapAt} pan={[72, 79]} zoom={[1.0, 1.04]} />
+        {wide ? (
+          <Photo src="supercheap/photos/truck-highway.jpg" frame={f} from={start} to={mapAt} posY={60} zoom={[1.0, 1.04]} pan={[60, 64]} />
+        ) : (
+          <Photo src="supercheap/photos/truck-highway.jpg" frame={f} from={start} to={mapAt} pan={[72, 79]} zoom={[1.0, 1.04]} />
+        )}
       </AbsoluteFill>
     );
   }
@@ -204,14 +224,25 @@ export const Routes: React.FC<{f: number}> = ({f}) => {
   }
   return (
     <AbsoluteFill style={white}>
-      <div style={{position: 'absolute', left: 80, top: 250}}>
+      <div style={{position: 'absolute', left: wide ? 960 : 80, top: wide ? 110 : 250}}>
         <AusMap routes={routes} dots={dots} land={ease(f, [mapAt, mapAt + 6], [0, 1])} />
       </div>
-      <div style={{position: 'absolute', left: SAFE.left, top: 1030, display: 'flex', alignItems: 'center', gap: 34, ...statIn}}>
-        <div style={{fontFamily: POPPINS, fontWeight: 800, fontSize: 220, lineHeight: 0.9, letterSpacing: -6, color: S.red500, transform: `scale(${f >= land ? interpolate(f, [land, land + 3, land + 8], [1, 1.08, 1], clamp) : 1})`, transformOrigin: 'left center'}}>
+      <div
+        style={{
+          position: 'absolute',
+          left: wide ? WIDE.left : SAFE.left,
+          top: wide ? 300 : 1030,
+          display: 'flex',
+          flexDirection: wide ? 'column' : 'row',
+          alignItems: wide ? 'flex-start' : 'center',
+          gap: wide ? 20 : 34,
+          ...statIn,
+        }}
+      >
+        <div style={{fontFamily: POPPINS, fontWeight: 800, fontSize: wide ? 260 : 220, lineHeight: 0.9, letterSpacing: -6, color: S.red500, transform: `scale(${f >= land ? interpolate(f, [land, land + 3, land + 8], [1, 1.08, 1], clamp) : 1})`, transformOrigin: 'left center'}}>
           {n}+
         </div>
-        <div style={{fontFamily: POPPINS, fontWeight: 700, fontSize: 54, lineHeight: 1.1, color: S.navy700}}>
+        <div style={{fontFamily: POPPINS, fontWeight: 700, fontSize: wide ? 64 : 54, lineHeight: 1.1, color: S.navy700}}>
           interstate routes
           <br />
           across Australia
@@ -241,17 +272,19 @@ export const Backloading: React.FC<{f: number}> = ({f}) => {
     const y = 170 + (slot[1] - 170) * p - Math.sin(p * Math.PI) * 160;
     return {p, x, y, kind: house.kind, at};
   });
+  const wide = useWide();
   return (
     <AbsoluteFill style={white}>
       <Headline
         frame={f}
-        top={250}
+        top={wide ? 360 : 250}
+        {...(wide ? COL : {})}
         lines={[
-          {text: 'Backloading =', at: share},
-          {text: 'Pay less', at: payLess, red: true, underline: true},
+          {text: 'Backloading =', at: share, size: wide ? 82 : 88},
+          {text: 'Pay less', at: payLess, red: true, underline: true, size: wide ? 110 : 88},
         ]}
       />
-      <svg width={1080} height={900} viewBox="0 0 1080 900" style={{position: 'absolute', left: 0, top: 520, overflow: 'visible'}}>
+      <svg width={1080} height={900} viewBox="0 0 1080 900" style={{position: 'absolute', left: wide ? 860 : 0, top: wide ? 40 : 520, overflow: 'visible'}}>
         {HOUSES.map((h) => (
           <g key={h.x} opacity={ease(f, [share - 6, share], [0, 1])}>
             <House x={h.x} y={110} door={h.door} />
@@ -289,18 +322,20 @@ export const HouseAndCar: React.FC<{f: number}> = ({f}) => {
   const onRamp = interpolate(cx, [-30, 70], [0, 1], clamp);
   const cy = groundY + (deckY - groundY) * onRamp;
   const tilt = cx > -30 && cx < 70 ? -16 : 0;
+  const wide = useWide();
   return (
     <AbsoluteFill style={white}>
       <Headline
         frame={f}
-        top={250}
+        top={wide ? 360 : 250}
+        {...(wide ? COL : {})}
         lines={[
-          {text: 'House + car.', at: start + 6},
-          {text: 'One booking.', at: booking, red: true, underline: true},
+          {text: 'House + car.', at: start + 6, size: wide ? 96 : 88},
+          {text: 'One booking.', at: booking, red: true, underline: true, size: wide ? 96 : 88},
         ]}
       />
       {f < cut ? (
-        <svg width={1080} height={800} viewBox="0 0 1080 800" style={{position: 'absolute', left: 0, top: 560, overflow: 'visible'}}>
+        <svg width={1080} height={800} viewBox="0 0 1080 800" style={{position: 'absolute', left: wide ? 820 : 0, top: wide ? 130 : 560, overflow: 'visible'}}>
           <rect x={-40} y={groundY + 34} width={1160} height={8} rx={4} fill={S.navy100} />
           {/* car trailer with ramp */}
           <path d={`M-30 ${groundY + 30} L70 ${deckY + 30} L420 ${deckY + 30} L420 ${deckY + 52} L-30 ${groundY + 34} Z`} fill={S.navy700} />
@@ -314,7 +349,15 @@ export const HouseAndCar: React.FC<{f: number}> = ({f}) => {
           <Car x={cx} y={cy} tilt={tilt} />
         </svg>
       ) : (
-        <div style={{position: 'absolute', left: SAFE_CX - 352, top: 520, width: 704, height: 840, borderRadius: 28, overflow: 'hidden', boxShadow: '0 24px 60px rgba(22,26,66,0.22)'}}>
+        <div
+          style={{
+            position: 'absolute',
+            ...(wide ? {left: 1120, top: 80, width: 640, height: 790} : {left: SAFE_CX - 352, top: 520, width: 704, height: 840}),
+            borderRadius: 28,
+            overflow: 'hidden',
+            boxShadow: '0 24px 60px rgba(22,26,66,0.22)',
+          }}
+        >
           <Photo src="supercheap/photos/people-4.jpg" frame={f} from={cut} to={cut + 60} zoom={[1.08, 1.0]} posY={45} />
         </div>
       )}
@@ -329,22 +372,24 @@ export const Proof: React.FC<{f: number}> = ({f}) => {
   const moves = sec(phraseAt(10, 'Thousands'));
   const people = sec(phraseAt(10, 'Real people'));
   const n = Math.round(interpolate(f, [years, years + 18], [0, 10], {...clamp, easing: Easing.out(Easing.cubic)}));
+  const wide = useWide();
   const cards = [
-    {src: 'people-1', x: 70, rot: -5},
-    {src: 'people-2', x: 385, rot: 2},
-    {src: 'people-3', x: 700, rot: -3},
+    {src: 'people-1', x: wide ? 900 : 70, rot: -5},
+    {src: 'people-2', x: wide ? 1215 : 385, rot: 2},
+    {src: 'people-3', x: wide ? 1530 : 700, rot: -3},
   ];
   return (
     <AbsoluteFill style={white}>
-      <div style={{position: 'absolute', left: SAFE.left, top: 250, width: SAFE_W, fontFamily: POPPINS}}>
+      <div style={{position: 'absolute', left: wide ? WIDE.left : SAFE.left, top: wide ? 250 : 250, width: wide ? WIDE.colW : SAFE_W, fontFamily: POPPINS}}>
         <div style={{display: 'flex', alignItems: 'baseline', gap: 26, ...textIn(f, years - 2)}}>
           <div style={{fontWeight: 800, fontSize: 200, lineHeight: 0.95, letterSpacing: -6, color: S.red500}}>{n}+</div>
           <div style={{fontWeight: 800, fontSize: 88, color: S.navy700}}>YEARS</div>
         </div>
-        <div style={{fontWeight: 800, fontSize: 70, lineHeight: 1.05, color: S.navy700, marginTop: 18, ...textIn(f, moves)}}>
+        <div style={{fontWeight: 800, fontSize: wide ? 84 : 70, lineHeight: 1.05, color: S.navy700, marginTop: 18, ...textIn(f, moves)}}>
           <Underlined frame={f} at={moves + 8}>
             THOUSANDS
-          </Underlined>{' '}
+          </Underlined>
+          {wide ? <br /> : ' '}
           OF MOVES
         </div>
       </div>
@@ -356,9 +401,9 @@ export const Proof: React.FC<{f: number}> = ({f}) => {
             style={{
               position: 'absolute',
               left: c.x,
-              top: 760,
-              width: 310,
-              height: 440,
+              top: wide ? 230 : 760,
+              width: wide ? 300 : 310,
+              height: wide ? 460 : 440,
               borderRadius: 24,
               overflow: 'hidden',
               border: `8px solid ${S.white}`,
@@ -379,17 +424,19 @@ export const Proof: React.FC<{f: number}> = ({f}) => {
 export const EndCard: React.FC<{f: number}> = ({f}) => {
   const cta = sec(phraseAt(11, 'Get your price'));
   const ctaIn = pop(f, cta - 2);
+  const wide = useWide();
+  const logoW = wide ? 760 : 820;
   return (
     <AbsoluteFill style={white}>
-      <div style={{position: 'absolute', left: SAFE_CX - 410, top: 420}}>
-        <LogoSting frame={f} at={SNAPS.end} width={820} />
+      <div style={{position: 'absolute', left: (wide ? 960 : SAFE_CX) - logoW / 2, top: wide ? 110 : 420}}>
+        <LogoSting frame={f} at={SNAPS.end} width={logoW} />
       </div>
-      <div style={{position: 'absolute', left: SAFE.left, width: SAFE_W, top: 760, textAlign: 'center', fontFamily: POPPINS}}>
-        <div style={{fontWeight: 800, fontSize: 80, lineHeight: 1.05, color: S.navy700, ...textIn(f, SNAPS.end + 6)}}>STOP COMPARING.</div>
+      <div style={{position: 'absolute', left: wide ? 0 : SAFE.left, width: wide ? WIDE.w : SAFE_W, top: wide ? 380 : 760, textAlign: 'center', fontFamily: POPPINS}}>
+        <div style={{fontWeight: 800, fontSize: wide ? 96 : 80, lineHeight: 1.05, color: S.navy700, ...textIn(f, SNAPS.end + 6)}}>STOP COMPARING.</div>
         <div
           style={{
             display: 'inline-block',
-            marginTop: 64,
+            marginTop: wide ? 48 : 64,
             background: S.red500,
             color: S.white,
             fontWeight: 700,
@@ -402,7 +449,7 @@ export const EndCard: React.FC<{f: number}> = ({f}) => {
         >
           Get your price now
         </div>
-        <div style={{marginTop: 56, fontWeight: 600, fontSize: 38, color: S.navy700, ...textIn(f, cta + 6)}}>{URL}</div>
+        <div style={{marginTop: wide ? 44 : 56, fontWeight: 600, fontSize: wide ? 40 : 38, color: S.navy700, ...textIn(f, cta + 6)}}>{URL}</div>
         <div style={{marginTop: 10, fontWeight: 700, fontSize: 48, color: S.red600, ...textIn(f, cta + 10)}}>{PHONE}</div>
       </div>
     </AbsoluteFill>

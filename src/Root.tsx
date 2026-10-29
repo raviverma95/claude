@@ -40,6 +40,7 @@ export const RemotionRoot: React.FC = () => (
       defaultProps={{hasVo: false, hasMusic: false}}
       calculateMetadata={calculateMetadata}
     />
-    <Composition id="Supercheap" component={SupercheapAd} durationInFrames={SUPERCHEAP_DURATION} fps={30} width={1080} height={1920} />
+    <Composition id="Supercheap" component={SupercheapAd} durationInFrames={SUPERCHEAP_DURATION} fps={30} width={1080} height={1920} defaultProps={{format: 'vertical' as const}} />
+    <Composition id="SupercheapWide" component={SupercheapAd} durationInFrames={SUPERCHEAP_DURATION} fps={30} width={1920} height={1080} defaultProps={{format: 'wide' as const}} />
   </>
 );

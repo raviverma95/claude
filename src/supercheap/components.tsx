@@ -2,6 +2,7 @@ import React from 'react';
 import {Img, interpolate, staticFile} from 'remotion';
 import {CAPTIONS} from './captions';
 import {CAPTION_BOTTOM, clamp, ease, fadeOut, FPS, LOGO, pop, POPPINS, S, SAFE, SAFE_W, textIn} from './brand';
+import {useWide, WIDE} from './format';
 
 /** Render `*word*` as a red word; the rest in the given colour. */
 export const Stressed: React.FC<{text: string; red: string}> = ({text, red}) => (
@@ -20,35 +21,29 @@ export const Stressed: React.FC<{text: string; red: string}> = ({text, red}) => 
 
 /** Burned-in caption: white on a navy-900 pill at 85%, stressed word in red-400, just above the bottom safe zone. */
 export const Captions: React.FC<{frame: number}> = ({frame}) => {
+  const wide = useWide();
   const t = frame / FPS;
   const c = CAPTIONS.find((x) => x.onScreen && t >= x.start - 0.03 && t < x.end + 0.12);
   if (!c) return null;
   const at = Math.round(c.start * FPS) - 1;
   const p = interpolate(frame, [at, at + 4.5], [0.95, 1], clamp);
+  const box = wide
+    ? {left: 0, width: WIDE.w, bottom: WIDE.h - WIDE.captionBottom, maxWidth: 1400, fontSize: WIDE.captionSize, padding: '14px 32px'}
+    : {left: SAFE.left, width: SAFE_W, bottom: 1920 - CAPTION_BOTTOM, maxWidth: SAFE_W, fontSize: 56, padding: '24px 40px'};
   return (
-    <div
-      style={{
-        position: 'absolute',
-        left: SAFE.left,
-        width: SAFE_W,
-        bottom: 1920 - CAPTION_BOTTOM,
-        display: 'flex',
-        justifyContent: 'center',
-        zIndex: 50,
-      }}
-    >
+    <div style={{position: 'absolute', left: box.left, width: box.width, bottom: box.bottom, display: 'flex', justifyContent: 'center', zIndex: 50}}>
       <div
         style={{
           background: 'rgba(22,26,66,0.85)',
           color: S.white,
           fontFamily: POPPINS,
           fontWeight: 700,
-          fontSize: 56,
+          fontSize: box.fontSize,
           lineHeight: 1.15,
-          padding: '24px 40px',
+          padding: box.padding,
           borderRadius: 999,
           textAlign: 'center',
-          maxWidth: SAFE_W,
+          maxWidth: box.maxWidth,
           boxSizing: 'border-box',
           transform: `scale(${p})`,
           opacity: interpolate(frame, [at, at + 2], [0, 1], clamp),
@@ -96,12 +91,14 @@ export const Headline: React.FC<{
   dark?: boolean;
   align?: 'left' | 'center';
   out?: number;
-}> = ({lines, frame, top, dark, align = 'left', out}) => (
+  left?: number;
+  width?: number;
+}> = ({lines, frame, top, dark, align = 'left', out, left = SAFE.left, width = SAFE_W}) => (
   <div
     style={{
       position: 'absolute',
-      left: SAFE.left,
-      width: SAFE_W,
+      left,
+      width,
       top,
       textAlign: align,
       fontFamily: POPPINS,

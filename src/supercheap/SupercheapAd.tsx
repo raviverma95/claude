@@ -3,10 +3,14 @@ import {AbsoluteFill, Audio, interpolate, Sequence, staticFile, useCurrentFrame}
 import {S, sec} from './brand';
 import {voTimings} from './captions';
 import {Captions} from './components';
+import {Format, FormatContext} from './format';
 import {Couch, Hook, Overload} from './problem';
 import {Backloading, Calculator, EndCard, HouseAndCar, Insured, LogoReveal, Proof, Routes, SNAPS} from './solution';
 
-/** "Who do you trust?" 55 s, 1080 x 1920. Scenes 1-4 navy (problem), 5-12 white (solution). */
+/**
+ * "Who do you trust?" 55 s. Scenes 1-4 navy (problem), 5-12 white (solution).
+ * format 'vertical' = 1080 x 1920 master; 'wide' = 1920 x 1080 for YouTube HD.
+ */
 export const DURATION = sec(55);
 
 const SCENES: [number, React.FC<{f: number}>][] = [
@@ -37,7 +41,7 @@ const musicVolume = (frame: number) => {
   return v;
 };
 
-export const SupercheapAd: React.FC = () => {
+export const SupercheapAd: React.FC<{format?: Format}> = ({format = 'vertical'}) => {
   const frame = useCurrentFrame();
   let idx = 0;
   SCENES.forEach(([from], i) => {
@@ -45,6 +49,7 @@ export const SupercheapAd: React.FC = () => {
   });
   const Scene = SCENES[idx][1];
   return (
+    <FormatContext.Provider value={format}>
     <AbsoluteFill style={{background: S.white}}>
       <Scene f={frame} />
       <Captions frame={frame} />
@@ -56,5 +61,6 @@ export const SupercheapAd: React.FC = () => {
         </Sequence>
       ))}
     </AbsoluteFill>
+    </FormatContext.Provider>
   );
 };

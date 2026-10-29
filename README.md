@@ -54,15 +54,19 @@ Render with `--props='{"captions":true}'` to burn the script in as subtitles.
 55 s vertical ad (1080 x 1920, 30 fps) built from the client script and the Supercheap Video Brand guideline (red `#ED1A38`, navy `#242A66`, Poppins, safe zones 220 px top / 380 px bottom / 64 px left / 160 px right).
 
 - `renders/supercheap/supercheap-who-do-you-trust-9x16.mp4`: master (captions burned in, audio at -14 LUFS)
+- `renders/supercheap/supercheap-who-do-you-trust-16x9-1080p.mp4`: YouTube HD, 1920 x 1080, same timing and audio
 - `renders/supercheap/supercheap-who-do-you-trust.srt`: subtitles for YouTube
-- `renders/supercheap/stills/`: one still per scene
+- `renders/supercheap/stills/`, `renders/supercheap/stills-16x9/`: one still per scene
 
 ```bash
 python3 scripts/make_vo.py scripts/vo/supercheap.json   # voiceover (ElevenLabs, Charlie, Australian)
 python3 scripts/supercheap_audio.py                     # ticking bed, music cut, finger snap
 python3 scripts/supercheap_srt.py                       # .srt
 npx remotion render Supercheap out/supercheap.mp4 --codec h264 --crf 16
+npx remotion render SupercheapWide out/supercheap-wide.mp4 --codec h264 --crf 16
 ```
+
+The 16:9 version uses the same scenes; each scene reads the format (`src/supercheap/format.ts`) and lays out text left, visual right. Captions and small text follow the guideline's x 0.6 rule for 16:9; headlines and numbers are a little larger for punch.
 
 - Code: `src/supercheap/` (`brand.ts` tokens and motion, `components.tsx` captions/headlines/logo sting, `problem.tsx` scenes 1-4 on navy, `solution.tsx` scenes 5-12 on white, `drawings.tsx` illustrations).
 - Captions: `public/supercheap/captions.json`, one stressed word per phrase in `*stars*`; the video and the .srt both read it.

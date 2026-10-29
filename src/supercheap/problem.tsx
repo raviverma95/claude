@@ -4,6 +4,7 @@ import {phraseAt} from './captions';
 import {clamp, ease, pop, POPPINS, S, SAFE, SAFE_W, sec, slam, textIn} from './brand';
 import {Stressed, Underlined, PhoneFrame} from './components';
 import {AdCard, CouchPerson, TabStrip} from './drawings';
+import {useWide, WIDE} from './format';
 
 const navy: React.CSSProperties = {background: S.navy900};
 
@@ -16,21 +17,29 @@ export const Hook: React.FC<{f: number}> = ({f}) => {
   const scroll = (f % 10) * 34 + cut * 290;
   const count = Math.round(interpolate(f, [4, 20], [1, 50], {...clamp, easing: Easing.out(Easing.cubic)}));
   const quotesAt = sec(1.45);
+  const wide = useWide();
+  // vertical: one column of ads; wide: three columns scrolling at slightly different speeds
+  const columns = wide ? [0, 1, 2] : [0];
+  const colW = wide ? 560 : 900;
   return (
     <AbsoluteFill style={navy}>
-      <div style={{position: 'absolute', left: 90, right: 90, top: 0, bottom: 0, overflow: 'hidden', opacity: 0.32, filter: 'blur(1.5px)'}}>
-        <div style={{position: 'absolute', left: 0, right: 0, top: -(scroll % 2400) - 200, display: 'flex', flexDirection: 'column', gap: 28}}>
-          {Array.from({length: 24}).map((_, i) => (
-            <AdCard key={i} w={900} claim={FEED[(i + cut * 5) % FEED.length]} tag={i % 3 === 1 ? 'Sponsored' : 'Ad'} claimColor={S.navy100} />
-          ))}
-        </div>
+      <div style={{position: 'absolute', left: wide ? 60 : 90, right: wide ? 60 : 90, top: 0, bottom: 0, overflow: 'hidden', opacity: 0.32, filter: 'blur(1.5px)', display: 'flex', gap: 40}}>
+        {columns.map((c) => (
+          <div key={c} style={{position: 'relative', width: colW, flexShrink: 0}}>
+            <div style={{position: 'absolute', left: 0, right: 0, top: -((scroll * (1 + c * 0.15) + c * 500) % 2400) - 200, display: 'flex', flexDirection: 'column', gap: 28}}>
+              {Array.from({length: 24}).map((_, i) => (
+                <AdCard key={i} w={colW} claim={FEED[(i + cut * 5 + c * 4) % FEED.length]} tag={(i + c) % 3 === 1 ? 'Sponsored' : 'Ad'} claimColor={S.navy100} />
+              ))}
+            </div>
+          </div>
+        ))}
       </div>
       <div
         style={{
           position: 'absolute',
-          left: SAFE.left,
-          width: SAFE_W,
-          top: 560,
+          left: wide ? 0 : SAFE.left,
+          width: wide ? WIDE.w : SAFE_W,
+          top: wide ? 200 : 560,
           textAlign: 'center',
           fontFamily: POPPINS,
           fontWeight: 800,
@@ -40,9 +49,9 @@ export const Hook: React.FC<{f: number}> = ({f}) => {
           textTransform: 'uppercase',
         }}
       >
-        <div style={{fontSize: 230, ...slam(f, 3)}}>{count}</div>
-        <div style={{fontSize: 96, marginTop: 6, ...slam(f, 11)}}>removalists.</div>
-        <div style={{fontSize: 116, marginTop: 44, color: S.red400, ...slam(f, quotesAt)}}>
+        <div style={{fontSize: wide ? 210 : 230, ...slam(f, 3)}}>{count}</div>
+        <div style={{fontSize: wide ? 104 : 96, marginTop: 6, ...slam(f, 11)}}>removalists.</div>
+        <div style={{fontSize: wide ? 128 : 116, marginTop: wide ? 36 : 44, color: S.red400, ...slam(f, quotesAt)}}>
           <Underlined frame={f} at={quotesAt + 8} color={S.red400}>
             50 quotes.
           </Underlined>
@@ -60,11 +69,15 @@ export const Couch: React.FC<{f: number; closing?: boolean}> = ({f, closing}) =>
   const rub = closing ? ease(f, [start, start + 8], [1, 0]) : 1;
   const zoom = interpolate(f, [start, start + (closing ? 87 : 57)], [1, closing ? 1.04 : 1.06], clamp);
   const tabsIn = pop(f, start + 6);
+  const wide = useWide();
+  // wide: the 1080 x 900 drawing sits centred; the tab strip moves beside the head
+  const box = wide ? {left: 420, top: 50} : {left: 0, top: 420};
+  const tabs = wide ? {left: 640, top: 110} : {left: 300, top: -110};
   return (
     <AbsoluteFill style={navy}>
-      <div style={{position: 'absolute', left: 0, top: 420, transform: `scale(${zoom})`, transformOrigin: '540px 600px'}}>
+      <div style={{position: 'absolute', ...box, transform: `scale(${zoom})`, transformOrigin: '540px 600px'}}>
         {!closing && (
-          <div style={{position: 'absolute', left: 300, top: -110, opacity: Math.min(1, tabsIn * 1.5), transform: `translateY(${(1 - tabsIn) * 30}px)`}}>
+          <div style={{position: 'absolute', ...tabs, opacity: Math.min(1, tabsIn * 1.5), transform: `translateY(${(1 - tabsIn) * 30}px)`}}>
             <TabStrip tabs={15} width={480} />
           </div>
         )}
@@ -75,17 +88,19 @@ export const Couch: React.FC<{f: number; closing?: boolean}> = ({f, closing}) =>
 };
 
 /* Scene 3 (5.0-12.1 s): callbacks, fine print, everyone's "cheapest". */
-const QuoteLine: React.FC<{f: number; at: number; text: React.ReactNode; top?: number}> = ({f, at, text, top = 250}) => (
+const QuoteLine: React.FC<{f: number; at: number; text: React.ReactNode}> = ({f, at, text}) => {
+  const wide = useWide();
+  return (
   <div
     style={{
       position: 'absolute',
-      left: SAFE.left,
-      width: SAFE_W,
-      top,
-      textAlign: 'center',
+      left: wide ? WIDE.left : SAFE.left,
+      width: wide ? WIDE.colW : SAFE_W,
+      top: wide ? 400 : 250,
+      textAlign: wide ? 'left' : 'center',
       fontFamily: POPPINS,
       fontWeight: 700,
-      fontSize: 72,
+      fontSize: wide ? 84 : 72,
       lineHeight: 1.1,
       color: S.white,
       zIndex: 5,
@@ -94,16 +109,18 @@ const QuoteLine: React.FC<{f: number; at: number; text: React.ReactNode; top?: n
   >
     {typeof text === 'string' ? <Stressed text={text} red={S.red400} /> : text}
   </div>
-);
+  );
+};
 
 const Callback: React.FC<{f: number; start: number}> = ({f, start}) => {
   const noAnswer = f >= start + 34;
   const ring = (k: number) => ((f - start + k * 10) % 30) / 30;
   const emails = [0, 1, 2, 3].map((i) => pop(f, start + 40 + i * 6));
+  const wide = useWide();
   return (
     <>
       <QuoteLine f={f} at={start + 2} text={'“We\'ll call you *back*...”'} />
-      <div style={{position: 'absolute', left: 290, top: 480}}>
+      <div style={{position: 'absolute', left: wide ? 1140 : 290, top: wide ? 110 : 480, transform: wide ? 'scale(0.95)' : undefined, transformOrigin: '0 0'}}>
         {!noAnswer &&
           [0, 1, 2].map((k) => (
             <div
@@ -167,7 +184,8 @@ const Callback: React.FC<{f: number; start: number}> = ({f, start}) => {
 };
 
 const FinePrint: React.FC<{f: number; start: number}> = ({f, start}) => {
-  const zoom = ease(f, [start + 10, start + 50], [0.9, 1.12]);
+  const wide = useWide();
+  const zoom = ease(f, [start + 10, start + 50], wide ? [0.8, 0.96] : [0.9, 1.12]);
   const circle = ease(f, [start + 18, start + 34], [0, 1]);
   return (
     <>
@@ -180,7 +198,7 @@ const FinePrint: React.FC<{f: number; start: number}> = ({f, start}) => {
           </>
         }
       />
-      <div style={{position: 'absolute', left: 160, top: 430, transform: `scale(${zoom}) rotate(-3deg)`, transformOrigin: '380px 860px'}}>
+      <div style={{position: 'absolute', left: wide ? 1040 : 160, top: wide ? 60 : 430, transform: `scale(${zoom}) rotate(-3deg)`, transformOrigin: '380px 860px'}}>
         <div style={{width: 760, height: 900, background: S.white, borderRadius: 28, padding: '56px 60px', boxSizing: 'border-box', fontFamily: POPPINS, color: S.navy700}}>
           <div style={{fontWeight: 600, fontSize: 30, letterSpacing: 2, color: S.muted}}>MOVING QUOTE</div>
           <div style={{fontWeight: 700, fontSize: 44, marginTop: 10}}>Interstate move</div>
@@ -206,17 +224,22 @@ const FinePrint: React.FC<{f: number; start: number}> = ({f, start}) => {
   );
 };
 
-const STAMPS = ['CHEAPEST!', 'LOWEST PRICE', '#1 CHEAPEST', 'BEST PRICE', 'CHEAPEST MOVERS', 'UNBEATABLE', 'CHEAPEST IN AUS', 'PRICE MATCH', 'CHEAPEST!'];
+const STAMPS = ['CHEAPEST!', 'LOWEST PRICE', '#1 CHEAPEST', 'BEST PRICE', 'CHEAPEST MOVERS', 'UNBEATABLE', 'CHEAPEST IN AUS', 'PRICE MATCH', 'CHEAPEST!', 'LOWEST RATES'];
 
-const Cheapest: React.FC<{f: number; start: number}> = ({f, start}) => (
+const Cheapest: React.FC<{f: number; start: number}> = ({f, start}) => {
+  const wide = useWide();
+  // vertical: 3 x 3 grid; wide: 5 x 2
+  const cols = wide ? 5 : 3;
+  const stamps = STAMPS.slice(0, wide ? 10 : 9);
+  return (
   <>
-    <div style={{position: 'absolute', left: SAFE.left, top: 300, width: SAFE_W, display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 22}}>
-      {STAMPS.map((s, i) => {
+    <div style={{position: 'absolute', left: wide ? WIDE.left : SAFE.left, top: wide ? 110 : 300, width: wide ? WIDE.w - 2 * WIDE.left : SAFE_W, display: 'grid', gridTemplateColumns: `repeat(${cols}, 1fr)`, gap: 22}}>
+      {stamps.map((s, i) => {
         const p = pop(f, start + 4 + i * 4, {damping: 10, stiffness: 260, mass: 0.5});
         const jitter = f > start + 40 ? Math.sin(f * 2.3 + i) * 3 : 0;
         return (
           <div key={i} style={{position: 'relative', opacity: Math.min(1, p * 1.6), transform: `scale(${0.6 + 0.4 * p}) translate(${jitter}px, ${-jitter}px)`}}>
-            <AdCard w={271} claim="" style={{height: 330}} />
+            <AdCard w={wide ? 318 : 271} claim="" style={{height: 330}} />
             <div
               style={{
                 position: 'absolute',
@@ -242,7 +265,8 @@ const Cheapest: React.FC<{f: number; start: number}> = ({f, start}) => (
       })}
     </div>
   </>
-);
+  );
+};
 
 export const Overload: React.FC<{f: number}> = ({f}) => {
   const b2 = sec(phraseAt(2, 'hiding'));
