@@ -1,0 +1,76 @@
+{
+ "voice": "IKne3meq5aSn9XLyUdCD",
+ "model": "eleven_multilingual_v2",
+ "total": 55.0,
+ "speed": 1.1,
+ "max_pause": 0.3,
+ "min_gap": 0.25,
+ "max_late": 0.6,
+ "max_tempo": 1.04,
+ "stability": 0.45,
+ "style": 0.4,
+ "out": "public/supercheap/audio/vo.mp3",
+ "timings": "public/supercheap/audio/vo-timings.json",
+ "lines": [
+  [
+   0.3,
+   3.0,
+   "Fifty removalists. Fifty different quotes."
+  ],
+  [
+   3.0,
+   6.0,
+   "Who do you actually trust?"
+  ],
+  [
+   5.2,
+   12.0,
+   "One won't give you a price without a callback. One's hiding fees in the fine print. And every single one says they're the cheapest."
+  ],
+  [
+   12.2,
+   14.4,
+   "Moving interstate is stressful enough."
+  ],
+  [
+   15.5,
+   19.0,
+   "Supercheap Interstate Removals keeps it simple."
+  ],
+  [
+   19.2,
+   25.0,
+   "Pick your home size and get your price instantly. No callbacks. No guessing."
+  ],
+  [
+   25.2,
+   30.0,
+   "Your stuff is fully insured and packed by trained removalists."
+  ],
+  [
+   30.2,
+   35.0,
+   "Melbourne to Sydney, Brisbane, Perth, even Tassie."
+  ],
+  [
+   35.2,
+   40.0,
+   "Only moving a few things? Backloading means you share the truck and pay less."
+  ],
+  [
+   40.2,
+   45.0,
+   "Need your car moved too? One booking covers it."
+  ],
+  [
+   45.2,
+   50.0,
+   "Ten-plus years. Thousands of moves. Real people, real relief."
+  ],
+  [
+   50.2,
+   54.6,
+   "Stop comparing. Get your price in seconds."
+  ]
+ ]
+}

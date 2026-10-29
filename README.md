@@ -46,3 +46,25 @@ Render with `--props='{"captions":true}'` to burn the script in as subtitles.
 - `src/theme.ts`: brand tokens and motion defaults
 - `public/screens/`: website screenshots supplied by the client
 - `public/fonts/`: Poppins 700/800 and Inter 500 from Google Fonts, stored locally so renders work offline
+
+---
+
+# Supercheap Interstate Removals: "Who do you trust?"
+
+55 s vertical ad (1080 x 1920, 30 fps) built from the client script and the Supercheap Video Brand guideline (red `#ED1A38`, navy `#242A66`, Poppins, safe zones 220 px top / 380 px bottom / 64 px left / 160 px right).
+
+- `renders/supercheap/supercheap-who-do-you-trust-9x16.mp4`: master (captions burned in, audio at -14 LUFS)
+- `renders/supercheap/supercheap-who-do-you-trust.srt`: subtitles for YouTube
+- `renders/supercheap/stills/`: one still per scene
+
+```bash
+python3 scripts/make_vo.py scripts/vo/supercheap.json   # voiceover (ElevenLabs, Charlie, Australian)
+python3 scripts/supercheap_audio.py                     # ticking bed, music cut, finger snap
+python3 scripts/supercheap_srt.py                       # .srt
+npx remotion render Supercheap out/supercheap.mp4 --codec h264 --crf 16
+```
+
+- Code: `src/supercheap/` (`brand.ts` tokens and motion, `components.tsx` captions/headlines/logo sting, `problem.tsx` scenes 1-4 on navy, `solution.tsx` scenes 5-12 on white, `drawings.tsx` illustrations).
+- Captions: `public/supercheap/captions.json`, one stressed word per phrase in `*stars*`; the video and the .srt both read it.
+- Facts to confirm with the client: `src/supercheap/data.ts` (the calculator price is a placeholder until confirmed).
+- Music is the same Pixabay track as the BuyTech video, cut so the upbeat section starts on the logo snap; `music.mp3` is kept out of git (licence).

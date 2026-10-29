@@ -1,0 +1,51 @@
+{
+ "voice": "IKne3meq5aSn9XLyUdCD",
+ "model": "eleven_multilingual_v2",
+ "total": 38.0,
+ "speed": 1.17,
+ "max_pause": 0.28,
+ "min_gap": 0.3,
+ "max_late": 0.45,
+ "max_tempo": 1.05,
+ "stability": 0.5,
+ "style": 0.35,
+ "out": "public/audio/vo.mp3",
+ "timings": "public/audio/vo-timings.json",
+ "lines": [
+  [
+   0.4,
+   4.7,
+   "Omar has had the same camera sitting in his cart for eight months."
+  ],
+  [
+   4.8,
+   9.2,
+   "Every payday he opens it. Looks at the price. Closes the tab."
+  ],
+  [
+   9.05,
+   15.7,
+   "Meanwhile, life keeps happening. Sunrise at Jebel Jais. His daughter's first run on Kite Beach. All on a phone doing its best."
+  ],
+  [
+   15.8,
+   20.7,
+   "Then a friend sends him a link. Same camera. A price that finally makes sense."
+  ],
+  [
+   20.8,
+   27.2,
+   "Brand new, sealed. Free delivery, next day. And he pays when it reaches him."
+  ],
+  [
+   27.3,
+   31.0,
+   "This time, the photo looks the way the moment felt."
+  ],
+  [
+   34.6,
+   37.85,
+   "BuyTech. Great shots, minus the big price tag."
+  ]
+ ]
+}

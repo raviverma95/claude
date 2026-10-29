@@ -2,6 +2,7 @@ import React from 'react';
 import {Composition, staticFile} from 'remotion';
 import {BrandIntro, BrandIntroProps} from './BrandIntro';
 import {Reel} from './Reel';
+import {DURATION as SUPERCHEAP_DURATION, SupercheapAd} from './supercheap/SupercheapAd';
 
 const exists = async (path: string) => {
   try {
@@ -39,5 +40,6 @@ export const RemotionRoot: React.FC = () => (
       defaultProps={{hasVo: false, hasMusic: false}}
       calculateMetadata={calculateMetadata}
     />
+    <Composition id="Supercheap" component={SupercheapAd} durationInFrames={SUPERCHEAP_DURATION} fps={30} width={1080} height={1920} />
   </>
 );
